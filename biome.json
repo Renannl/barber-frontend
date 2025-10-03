@@ -12,7 +12,12 @@
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
-    "indentWidth": 2
+    "indentWidth": 2,
+    "lineWidth": 80,
+    "quoteStyle": "double",
+    "jsxQuoteStyle": "double",
+    "jsxBracketSameLine": false,
+    "preferSingleLine": false
   },
   "linter": {
     "enabled": true,

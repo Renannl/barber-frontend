@@ -1,0 +1,66 @@
+// $success-bg: #22c55e;
+// $success-border: #15803d;
+// $error-bg: #ef4444;
+// $error-border: #b91c1c;
+// $warning-bg: #f59e0b;
+// $warning-border: #b45309;
+// $info-bg: #3b82f6;
+// $info-border: #1d4ed8;
+// $text-light: #fff;
+
+// // toasts.module.scss
+// .toast {
+//   border-radius: 8px;
+//   padding: 12px 16px;
+//   font-weight: 600;
+//   color: $text-light;
+//   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+
+//   &--success {
+//     background-color: $success-bg;
+//     border: 1px solid $success-border;
+//   }
+
+//   &--error {
+//     background-color: $error-bg;
+//     border: 1px solid $error-border;
+//   }
+
+//   &--warning {
+//     background-color: $warning-bg;
+//     border: 1px solid $warning-border;
+//   }
+
+//   &--info {
+//     background-color: $info-bg;
+//     border: 1px solid $info-border;
+//   }
+// }
+
+.toast {
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-weight: 600;
+  color: #fff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.toast--success {
+  background-color: #22c55e;
+  border: 1px solid #15803d;
+}
+
+.toast--error {
+  background-color: #ef4444;
+  border: 1px solid #b91c1c;
+}
+
+.toast--warning {
+  background-color: #f59e0b;
+  border: 1px solid #b45309;
+}
+
+.toast--info {
+  background-color: #3b82f6;
+  border: 1px solid #1d4ed8;
+}
