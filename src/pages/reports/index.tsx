@@ -12,17 +12,22 @@ import {
   Thead,
   Box,
   Divider,
+  Center,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { SingleDatepicker } from "chakra-dayzed-datepicker";
 import { IconType } from "react-icons"; //Tipagem de icones
-import { FiClipboard, FiDollarSign } from "react-icons/fi";
+import { FiClipboard, FiDollarSign, FiArchive, FiCalendar, FiEye } from "react-icons/fi";
+import { ReportCard } from "../../components/reports/ReportCard";
+import { FaFilePdf, FaTicket  } from 'react-icons/fa6';
+
 
 //interface propriedades do relatório
-interface ReportProps {
+export interface ReportProps {
   name: string;
   icon: IconType; //<--Import aquii
-  value: number;
+  value?: number;
+  quantity?: number;
 }
 
 export default function Reports() {
@@ -34,24 +39,29 @@ export default function Reports() {
     //   icon: FiCalendar,
     // },
     {
+      name: "Clientes atendidos",
+      icon: FiEye,
+      quantity: 500,
+    },
+    {
+      name: "Ticket Médio",
+      icon: FaTicket,
+      value: 40,
+    },
+    {
+      name: "Faturamento Líquido",
+      icon: FiCalendar,
+      value: 100,
+    },
+    {
       name: "Faturamento Bruto",
+      icon: FiArchive,
+      value: 1000,
+    },
+    {
+      name: "Faturamento Líquido",
       icon: FiDollarSign,
-      value: 500.0,
-    },
-    {
-      name: "Faturamento Líquido",
-      icon: FiClipboard,
-      value: 770.0,
-    },
-    {
-      name: "Faturamento Líquido",
-      icon: FiClipboard,
-      value: 100,
-    },
-    {
-      name: "Faturamento Líquido",
-      icon: FiClipboard,
-      value: 100,
+      value: 700,
     },
   ];
   return (
@@ -59,20 +69,17 @@ export default function Reports() {
       <Head>
         <title>Relatórios - Minha barbearia</title>
       </Head>
+
       <Sidebar>
-        <Flex
-          direction="column"
-          align="flex-start"
-          justify="flex-start"
-          justifyContent="flex-start"
-          maxW="700px"
-        >
-          <Heading fontSize="3xl" mt={4} mb={4} mr={4} color="orange.900">
+
+          <Heading fontSize="3xl" mt={4} mb={4} mr={4} color="orange.900" >
             Relatórios
           </Heading>
           {/*Utilizar o MAP para renderizar as opções do select*/}
-          <Flex direction="row" align="center" justify="center" gap={4}>
-            <Select>
+          <Flex direction="row" align="center" gap={4}>
+
+            <Select color="orange.900"  _hover={{ bg: "gray.800" }}>
+
               <option value="1">Relatório de agendamentos</option>
               <option value="2">Relatório de cortes</option>
               <option value="3">Relatório de clientes</option>
@@ -80,63 +87,34 @@ export default function Reports() {
               <option value="5">Relatório de usuários</option>
               <option value="6">Relatório de financeiro</option>
               <option value="7">Relatório de estoque</option>
+
             </Select>
 
             {/* Periodo do filtro, logo apos criar uma validação para que a data inicial seja menor que a data final*/}
 
-            <Input type="date" w="300px" placeholder="Data inicial" />
-            <Input type="date" w="300px" placeholder="Data final" />
+            <Input type="date" w="300px" placeholder="Data inicial" color="orange.900"  _hover={{ bg: "gray.800" }} />
+            <Input type="date" w="300px" placeholder="Data final" color="orange.900"  _hover={{ bg: "gray.800" }} />
 
-            <Button
-              w="300px"
-              size="lg"
-              color="gray.900"
-              bg="button.cta"
-              _hover={{ bg: "#FFb13e" }}
-            >
+            <Button w="300px" size="lg" color="gray.900" bg="button.cta" _hover={{ bg: "#FFb13e" }}>
               Gerar relatório
             </Button>
+
           </Flex>
-          <Divider margin={8} w="5xl" />
-          <Flex
-            direction="row"
-            align="center"
-            justify="center"
-            gap={4}
-            cursor="pointer"
-          >
-            {reportItems.map((item) => (
-              <Flex
-                key={item.name}
-                direction="column"
-                align="flex-start"
-                alignItems="center"
-                h="130px"
-                w="250px"
-                bg="barber.400"
-                rounded="8"
-                mt={4}
-                p={4}
-              >
-                <Flex gap={4} direction="column">
-                  <Flex direction="row" align="center" justify="center">
-                    <Icon as={item.icon} size={24} color="#fba931" />
-                  </Flex>
-                  <Text fontSize="medium" fontWeight="bold">
-                    {item.name}
-                  </Text>
-                  <Text fontSize="2xl" fontWeight="bold">
-                    {/*Formatador de moeda - Utilizar o helper para formatar a moeda*/}
-                    {new Intl.NumberFormat("pt-BR", {
-                      style: "currency",
-                      currency: "BRL",
-                    }).format(Number(item.value))}
-                  </Text>
-                </Flex>
-              </Flex>
+
+          <Divider position="relative" my={8}/>
+
+          <Flex direction="row" wrap="wrap" gap={4} justify="center"> 
+            {reportItems.map((item, idx) => ( 
+            <ReportCard key={idx} item={item} />
             ))}
           </Flex>
-        </Flex>
+
+          <Flex justify="flex-end" marginTop="10">
+            <Button leftIcon={<Icon as={FaFilePdf} w={5} h={5} />} w="200px" size="lg" color="gray.900" bg="button.cta" _hover={{ bg: "#FFb13e" }}>
+              Exportar relatório
+            </Button>
+          </Flex>
+
       </Sidebar>
     </>
   );
