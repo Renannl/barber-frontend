@@ -159,8 +159,8 @@ export default function Dashboard({ schedule }: DashboardProps) {
             <Button
               as={Link}
               href="/new"
-              bg="gray.700"
-              _hover={{ background: "gray.700" }}
+              bg="button.cta"
+              _hover={{ background: "#FFB13E" }}
             >
               Registrar
             </Button>

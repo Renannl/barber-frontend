@@ -28,6 +28,7 @@ export default function New({ haircuts }: NewProps) {
   const [horarioSelecionado, setHorarioSelecionado] = useState("");
   const [email, setEmail] = useState("");
   const [contato, setContato] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
 
@@ -72,6 +73,7 @@ export default function New({ haircuts }: NewProps) {
       return;
     }
 
+    setIsLoading(true);
     try {
       const apiClient = setupAPIClient();
 
@@ -93,6 +95,8 @@ export default function New({ haircuts }: NewProps) {
     } catch (err) {
       console.log("Erro ao registrar:", err);
       toast.error("Erro ao registrar!");
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -210,6 +214,8 @@ export default function New({ haircuts }: NewProps) {
               bg="button.cta"
               _hover={{ bg: "#FFb13e" }}
               onClick={handleRegister}
+              loadingText="Cadastrando"
+              isLoading={isLoading}
             >
               Cadastrar
             </Button>

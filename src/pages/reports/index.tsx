@@ -27,6 +27,7 @@ interface ReportProps {
 
 export default function Reports() {
   const [selectDate, setSelectDate] = useState<Date | null>(new Date());
+  const [isLoading, setIsLoading] = useState(false);
 
   const reportItems: Array<ReportProps> = [
     // {
@@ -54,6 +55,21 @@ export default function Reports() {
       value: 100,
     },
   ];
+
+  async function handleGenerateReport() {
+    setIsLoading(true);
+    try {
+      // Simular uma requisição para gerar o relatório
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      // Aqui você pode adicionar a lógica real para gerar o relatório
+      console.log("Relatório gerado com sucesso!");
+    } catch (error) {
+      console.error("Erro ao gerar relatório:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   return (
     <>
       <Head>
@@ -93,6 +109,9 @@ export default function Reports() {
               color="gray.900"
               bg="button.cta"
               _hover={{ bg: "#FFb13e" }}
+              onClick={handleGenerateReport}
+              loadingText="Gerando"
+              isLoading={isLoading}
             >
               Gerar relatório
             </Button>
