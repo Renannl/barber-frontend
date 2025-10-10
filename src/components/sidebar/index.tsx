@@ -12,6 +12,7 @@ import {
   useDisclosure,
   BoxProps,
   FlexProps,
+  Divider,
 } from "@chakra-ui/react";
 
 import {
@@ -23,8 +24,9 @@ import {
   FiCreditCard,
   FiHelpCircle,
 } from "react-icons/fi";
-import { IconType } from "react-icons";
 
+import { IconType } from "react-icons";
+import { FaUserCog } from "react-icons/fa";
 import Link from "next/link";
 
 interface LinkItemProps {
@@ -36,10 +38,10 @@ interface LinkItemProps {
 const LinkItems: Array<LinkItemProps> = [
   { name: "Agenda", icon: FiScissors, route: "/dashboard" },
   { name: "Cortes", icon: FiClipboard, route: "/haircuts" },
-  { name: "Minha Conta", icon: FiSettings, route: "/profile" },
   { name: "Relatórios", icon: FiBarChart, route: "/reports" },
   { name: "Caixa", icon: FiCreditCard, route: "/cashier" },
   { name: "Suporte", icon: FiHelpCircle, route: "/support" },
+  { name: "Minha Conta", icon: FaUserCog, route: "/profile" },
 ];
 
 export function Sidebar({ children }: { children: ReactNode }) {
@@ -79,16 +81,21 @@ interface SidebarProps extends BoxProps {
 }
 
 const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
+  const mainItems = LinkItems.filter((item) => item.name !== "Minha Conta");
+  const userSetting = LinkItems.find((item) => item.name === "Minha Conta");
+
   return (
-    <Box
+    <Flex
+      direction="column"
+      h="full"
       bg="barber.400"
       borderRight="1px"
       borderRightColor={useColorModeValue("gray.200", "gray.700")}
       w={{ base: "full", md: 60 }}
       pos="fixed"
-      h="full"
       {...rest}
     >
+      {/* Itens que ficam no topo */}
       <Flex h="20" alignItems="center" justifyContent="space-between" mx="8">
         <Link href="/dashboard">
           <Flex cursor="pointer" userSelect="none" flexDirection="row">
@@ -108,12 +115,23 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
         <CloseButton display={{ base: "flex", md: "none" }} onClick={onClose} />
       </Flex>
 
-      {LinkItems.map((link) => (
+      {mainItems.map((link) => (
         <NavItem icon={link.icon} route={link.route} key={link.name}>
           {link.name}
         </NavItem>
       ))}
-    </Box>
+
+      {userSetting && (
+        <NavItem
+          marginTop="auto"
+          icon={userSetting.icon}
+          route={userSetting.route}
+          key={userSetting.name}
+        >
+          {userSetting.name}
+        </NavItem>
+      )}
+    </Flex>
   );
 };
 
@@ -142,7 +160,7 @@ const NavItem = ({ icon, children, route, ...rest }: NavItemProps) => {
         {icon && (
           <Icon
             mr={4}
-            fontSize="16"
+            fontSize="30"
             as={icon}
             _groupHover={{
               color: "white",

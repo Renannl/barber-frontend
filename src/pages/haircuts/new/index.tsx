@@ -28,6 +28,7 @@ export default function NewHaircut({ subscription, count }: NewHaircutProps) {
 
   const [name, setName] = useState("");
   const [priceDisplay, setPriceDisplay] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   function handlePriceChange(e: ChangeEvent<HTMLInputElement>) {
     const onlyDigits = e.target.value.replace(/\D/g, "");
@@ -50,6 +51,7 @@ export default function NewHaircut({ subscription, count }: NewHaircutProps) {
       return;
     }
 
+    setIsLoading(true);
     try {
       const apiClient = setupAPIClient();
       await apiClient.post("/haircut", {
@@ -66,6 +68,8 @@ export default function NewHaircut({ subscription, count }: NewHaircutProps) {
       import("sonner").then(({ toast }) =>
         toast.error("Erro ao cadastrar esse modelo.")
       );
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -156,6 +160,8 @@ export default function NewHaircut({ subscription, count }: NewHaircutProps) {
               bg="button.cta"
               _hover={{ bg: "#FFb13e" }}
               disabled={!subscription && count >= 3}
+              loadingText="Cadastrando"
+              isLoading={isLoading}
             >
               Cadstrar
             </Button>

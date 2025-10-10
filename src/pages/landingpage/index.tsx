@@ -3,26 +3,32 @@ import Head from "next/head";
 import { Flex, Heading, Button, Input, Select, Text } from "@chakra-ui/react";
 // Página pública: não usa Sidebar autenticado
 import { toast } from "sonner";
+import Image from "next/image";
 
 export default function SimularAgendamento() {
   // Valores estáticos solicitados
-  const [nome, setNome] = useState("Ronaldin do inguiça");
-  const [email, setEmail] = useState("brenodesouzaeler@gmail.com");
-  const [telefone, setTelefone] = useState("27981235799");
+  const [nome, setNome] = useState("");
+  const [email, setEmail] = useState("");
+  const [celular, setCelular] = useState("");
   const [chatId, setChatId] = useState("1992351796");
-  const [data, setData] = useState("2025-09-25");
+  const [data, setData] = useState("");
   const [horario, setHorario] = useState("14:30");
-  const [userId, setUserId] = useState("2d813ce9-2978-4167-a8b8-fde1e7df184f");
-  const [haircuts, setHaircuts] = useState([
-    { id: "3954661d-a2ec-427f-a3eb-5404f6c97ca6", name: "Corte selecionado" },
-  ]);
+  const [userId, setUserId] = useState("");
+  const [haircuts, setHaircuts] = useState([]);
   const [haircutId, setHaircutId] = useState<string>(
     "3954661d-a2ec-427f-a3eb-5404f6c97ca6"
   );
+
   const [loadingCuts, setLoadingCuts] = useState(false);
   const [cutsError, setCutsError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3333";
+
+  function handerChanger(e: React.ChangeEvent<HTMLInputElement>) {
+    const valor = e.target.value;
+
+    setCelular(formatarCelular(valor));
+  }
 
   useEffect(() => {
     async function fetchCuts() {
@@ -67,7 +73,7 @@ export default function SimularAgendamento() {
     if (String(chatId).trim() === "") missing.push("chatId");
     if (nome.trim() === "") missing.push("nome");
     if (email.trim() === "") missing.push("email");
-    if (telefone.trim() === "") missing.push("telefone");
+    if (celular.trim() === "") missing.push("telefone");
     if (data.trim() === "") missing.push("data");
     if (horario.trim() === "") missing.push("horário");
     if (userId.trim() === "") missing.push("user_id");
@@ -78,7 +84,7 @@ export default function SimularAgendamento() {
         chatId,
         nome,
         email,
-        telefone,
+        celular,
         data,
         horario,
         userId,
@@ -98,7 +104,7 @@ export default function SimularAgendamento() {
         body: JSON.stringify({
           chatId: Number(chatId),
           nameClient: nome,
-          customerContact: telefone,
+          customerContact: celular,
           customerEmail: email,
           scheculeDateTime: dataIso,
           user_id: userId,
@@ -110,7 +116,7 @@ export default function SimularAgendamento() {
       toast.success("Solicitação enviada! Aguardando aprovação do barbeiro.");
       setNome("");
       setEmail("");
-      setTelefone("");
+      setCelular("");
       setChatId("");
       setData("");
       setHorario("");
@@ -123,11 +129,32 @@ export default function SimularAgendamento() {
     }
   }
 
+  const logoImg = "/images/logo.svg";
+
+  function formatarCelular(valor: string) {
+    //Faz a remoção de tudo que não for número
+    valor = valor.replace(/\D/g, "");
+    //Aplica formatação
+    if (valor.length > 10) {
+      valor = valor.replace(/^(\d{2})(\d{5})(\d{4}).*/, "($1) $2-$3");
+    } else if (valor.length > 6) {
+      valor = valor.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, "($1) $2-$3");
+    } else if (valor.length > 2) {
+      valor = valor.replace(/^(\d{2}) (\d{0,5})/, "($1) $2");
+    } else {
+      valor = valor.replace(/^(\d*)/, "$1");
+    }
+    return valor;
+  }
+
+  console.log(formatarCelular("27981235799"));
+
   return (
     <>
       <Head>
         <title>Solicitar agendamento</title>
       </Head>
+
       <Flex
         minH="100vh"
         bg="barber.900"
@@ -150,57 +177,38 @@ export default function SimularAgendamento() {
           justify="center"
           bg="barber.400"
         >
-          <Text mb={4} w="85%">
-            O pedido ficará em análise até o barbeiro aprovar.
-          </Text>
+          <Flex
+            w="50"
+            h="50"
+            pb={6}
+            rounded="full"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Image src={logoImg} alt="Logo" width={100} height={100} />
+          </Flex>
 
           <Input
-            placeholder="Chat ID (ex.: Telegram)"
-            w="85%"
+            mt={4}
             mb={3}
-            size="lg"
-            bg="barber.900"
-            type="number"
-            value={chatId}
-            onChange={(e) => setChatId(e.target.value)}
-          />
-          <Input
             placeholder="Nome"
             w="85%"
-            mb={3}
             size="lg"
             bg="barber.900"
             value={nome}
             onChange={(e) => setNome(e.target.value)}
+            isRequired={true}
           />
+
           <Input
-            placeholder="Email"
-            w="85%"
-            mb={3}
-            size="lg"
-            bg="barber.900"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <Input
-            placeholder="Telefone"
+            placeholder="(27) 99999-9999"
             w="85%"
             mb={3}
             size="lg"
             bg="barber.900"
             type="tel"
-            value={telefone}
-            onChange={(e) => setTelefone(e.target.value)}
-          />
-          <Input
-            placeholder="User ID do barbeiro"
-            w="85%"
-            mb={3}
-            size="lg"
-            bg="barber.900"
-            value={userId}
-            onChange={(e) => setUserId(e.target.value)}
+            value={celular}
+            onChange={handerChanger}
           />
 
           <Input
@@ -272,11 +280,16 @@ export default function SimularAgendamento() {
             bg="button.cta"
             _hover={{ bg: "#FFb13e" }}
             onClick={handleSubmit}
-            loadingText="Enviando"
+            loadingText="Enviando..."
             isLoading={isLoading}
           >
             Solicitar
           </Button>
+          <Text mb={4} w="85%" color="red" fontSize="2xl" margin={4}>
+            Atenção seu agendamento não sera aceito de imediato, o barbeiro terá
+            que aprovar o agendamento! Caso aprovado ou reprovado, a devolutiva
+            será enviada whatsapp.
+          </Text>
         </Flex>
       </Flex>
     </>

@@ -93,7 +93,7 @@ export default function Haircuts({ haircuts }: HaircutsProps) {
             </Heading>
 
             <Link href="/haircuts/new">
-              <Button bg="gray.700" _hover={{ background: "gray.700" }}>
+              <Button bg="button.cta" _hover={{ background: "#FFB13E" }}>
                 Cadastrar novo
               </Button>
             </Link>

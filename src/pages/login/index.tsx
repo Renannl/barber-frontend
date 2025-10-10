@@ -15,16 +15,19 @@ export default function Login() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false); // carregando
 
   async function handleLogin() {
     if (email === "" || password === "") {
       return;
     }
 
+    setIsLoading(true);
     await signIn({
       email,
       password,
     });
+    setIsLoading(false);
   }
 
   return (
@@ -79,6 +82,8 @@ export default function Login() {
             color="gray.900"
             size="lg"
             _hover={{ bg: "#ffb13e" }}
+            loadingText="Acessando"
+            isLoading={isLoading} //Spinner de carregamento
             onClick={handleLogin}
           >
             Acessar
