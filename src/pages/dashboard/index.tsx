@@ -5,6 +5,7 @@ import {
   Text,
   Heading,
   Button,
+  Container,
   Link as ChakraLink,
   useMediaQuery,
   useDisclosure,
@@ -17,6 +18,7 @@ import { canSSRAuth } from "../../utils/canSSRAuth";
 import { Sidebar } from "../../components/sidebar";
 import { setupAPIClient } from "../../services/api";
 import { ModalInfo } from "../../components/modal";
+import { FaTelegram, FaMobileAlt  } from 'react-icons/fa';
 
 export interface ScheduleItem {
   id: string;
@@ -29,12 +31,18 @@ export interface ScheduleItem {
   data?: string; // ex: "2025-09-24"
   scheduled_at?: string; // ex: ISO string
   status?: string;
+  source: string;
   haircut: {
     id: string;
     name: string;
     price: string | number;
     user_id: string;
   };
+}
+
+export interface TelegramScheduleItem extends ScheduleItem {
+  customerName: string;
+  scheduledAt: Date;
 }
 
 interface DashboardProps {
@@ -186,39 +194,70 @@ export default function Dashboard({ schedule }: DashboardProps) {
                   rounded={4}
                   mb={2}
                   bg="barber.400"
-                  justify="space-between"
-                  align={isMobile ? "flex-start" : "center"}
+                  align={isMobile ? "center" : "center"}
+                  justifyContent={isMobile ? "center" : "space-between"}
+                  textAlign={"center"}
+                  gap={10}
                 >
+                  
                   <Flex
                     direction="row"
-                    mb={isMobile ? 2 : 0}
+                    mb={isMobile ? 0 : 0}
                     align="center"
-                    justify="center"
+                    justify={isMobile ? "center" :"flex-start"}
+                    textAlign="center"
+                    w="100%"
                   >
-                    <IoMdPerson size={28} color="#f1f1f1" />
-                    <Text fontWeight="bold" ml={4} noOfLines={1}>
-                      {item?.customer}
-                    </Text>
+                      <IoMdPerson  size={30} color="#f1f1f1" />
+                      <Container
+                        w="fit-content"
+                        textAlign="center"
+                        ml={isMobile ? 2 : 4}
+                        p={0}
+                        m={0}
+                      >
+                      <Text
+                        fontWeight="bold"
+                        noOfLines={1}
+                        ml={isMobile ? "0" : "3"}
+                        textAlign="center"
+                        w="100%"
+                      >
+                        {item?.customer}
+                      </Text>
+                    </Container>
                   </Flex>
-
-                  <Text fontWeight="bold" mb={isMobile ? 2 : 0}>
-                    {item?.haircut?.name}
-                  </Text>
-                  <Text fontWeight="bold" mb={isMobile ? 2 : 0}>
-                    R$ {item?.haircut?.price}
-                  </Text>
-                  {(displayDate || displayTime) && (
+                  <Container minW='30px' textAlign="center">
+                    <Text fontWeight="bold" mb={isMobile ? 0 : 0}>
+                      {item?.haircut?.name}
+                    </Text>
+                  </Container>
+                  <Container minW='30px' textAlign="center">
+                    <Text fontWeight="bold" mb={isMobile ? 0 : 0}>
+                      R$ {item?.haircut?.price}
+                    </Text>
+                  </Container>
+                  <Container minW='30px' textAlign="center" justifyItems="center">
+                    <Text fontSize="sm" color="gray.300">
+                      {item.source === "telegram" ? <FaTelegram size={30} color="#0088cc" /> : <FaMobileAlt size={30} /> }
+                    </Text>
+                  </Container>
+                  {(displayDate || displayTime) && (  
                     <Flex
                       direction={"column"}
                       align={isMobile ? "flex-start" : "flex-end"}
                     >
                       {displayDate && (
-                        <Text fontWeight="bold" mb={isMobile ? 1 : 0}>
-                          {displayDate}
-                        </Text>
+                        <Container minW='30px' textAlign="center">
+                          <Text fontWeight="bold" mb={isMobile ? 0 : 0}>
+                            {displayDate}
+                          </Text>
+                        </Container>
                       )}
                       {displayTime && (
-                        <Text fontWeight="bold">{displayTime}</Text>
+                        <Container minW='30px' textAlign="center">
+                          <Text fontWeight="bold">{displayTime}</Text>
+                        </Container>
                       )}
                     </Flex>
                   )}
@@ -247,7 +286,11 @@ export default function Dashboard({ schedule }: DashboardProps) {
 export const getServerSideProps = canSSRAuth(async (ctx) => {
   try {
     const apiClient = setupAPIClient(ctx);
-    const response = await apiClient.get("/schedule");
+
+    const [response, telegramResponse] = await Promise.all([
+      apiClient.get("/schedule"),
+      apiClient.get("/telegramlist"),
+    ]);
 
     // Filtrar schedules no servidor para otimizar performance
     // Apenas schedules com status 'active' serão enviados para o cliente
@@ -255,9 +298,44 @@ export const getServerSideProps = canSSRAuth(async (ctx) => {
       (item: ScheduleItem) => item.status === "active"
     );
 
+    const activeTelegram = telegramResponse.data.filter(
+      (item: TelegramScheduleItem) => item.status === "accepted"
+    );
+
+    const normalizedApp: ScheduleItem[] = activeSchedules.map((item: ScheduleItem) => ({
+      id: item.id,
+      customer: item.customer || "Cliente",
+      haircut: {
+        id: item.haircut?.id,
+        name: item.haircut?.name,
+        price: item.haircut?.price,
+      },
+      scheduled_at: item.dataHora,
+      status: item.status,
+      source: "app",
+    }));
+
+    const normalizedTelegram: TelegramScheduleItem[] = activeTelegram.map((item: TelegramScheduleItem) => ({
+      id: item.id,
+      customer: item.customerName || "Cliente Telegram",
+      haircut: {
+        id: "telegram",
+        name: item.haircut?.name,
+        price: item.haircut?.price,
+      },
+      scheduled_at: item.scheduledAt,
+      status: item.status,
+      source: "telegram",
+    }));
+
+    const unified: ScheduleItem[] = [...normalizedApp, ...normalizedTelegram].sort(
+      (a, b) => 
+        new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime()
+    );
+    
     return {
       props: {
-        schedule: activeSchedules,
+        schedule: unified,
       },
     };
   } catch (err) {
